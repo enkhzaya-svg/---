@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="mn" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CX Мастер: Салбаруудын Борлуулалтын Нийт Процесс ба CX Маппинг</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome CSS CDN for webfont icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 360px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 330px;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-amber-50/20 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+<!-- Chosen Palette: Sand & Slate Minimal - Warm Off-white (#FDFBF7), Slate Blue (#1E293B), Warm Amber (#D97706), Teal (#0D9488), Indigo (#4F46E5) -->
+<!-- Application Structure Plan: Multi-industry interactive mapping application. Includes Industry Selector, Process Stage Stepper (Marketing -> Sales -> Post-Sale), Side-by-side CX Phase Badge Matrix (Needs, Expectations ID, Expectation Mgmt, Fulfilling), Risk Analysis, Chart.js Visualizer, and Scenario Simulator. Designed to give users instant operational visibility into CX alignment across any industry. -->
+<!-- Visualization & Content Choices: Used Chart.js Canvas for CX Stage Breakdown & Gap Distribution Charts. Used Tailwind flex/grid layouts with FontAwesome icons for step-by-step process cards and side-by-side CX mapping. Used Vanilla JS for dynamic industry switching, stage filtering, interactive modal/card expanders, and simulation math. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 text-white backdrop-blur border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="bg-amber-500 text-slate-900 font-extrabold px-2.5 py-1 rounded text-lg tracking-wider">CX</div>
+                <div>
+                    <span class="font-bold text-lg tracking-tight text-amber-400 block sm:inline">ПРОЦЕСС МАППЕР</span>
+                    <span class="text-xs font-normal text-slate-400 hidden lg:inline ml-2">| Салбаруудын төгсгөл хүртлэх процесс ба CX Уялдаа</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#industry-selector" class="hover:text-amber-400 transition-colors">Салбар Сонгох</a>
+                <a href="#process-mapper" class="hover:text-amber-400 transition-colors">Бүрэн Процесс Мап</a>
+                <a href="#cx-4step-summary" class="hover:text-amber-400 transition-colors">CX 4 Шат Уялдаа</a>
+                <a href="#analytics" class="hover:text-amber-400 transition-colors">Аналитик & Чанар</a>
+                <a href="#simulator" class="hover:text-amber-400 transition-colors">Симулятор</a>
+            </nav>
+            <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-white p-2">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-slate-800 border-b border-slate-700 px-4 pt-2 pb-4 space-y-2 text-sm">
+            <a href="#industry-selector" onclick="toggleMobileMenu()" class="block text-slate-200 hover:text-amber-400 py-1">Салбар Сонгох</a>
+            <a href="#process-mapper" onclick="toggleMobileMenu()" class="block text-slate-200 hover:text-amber-400 py-1">Бүрэн Процесс Мап</a>
+            <a href="#cx-4step-summary" onclick="toggleMobileMenu()" class="block text-slate-200 hover:text-amber-400 py-1">CX 4 Шат Уялдаа</a>
+            <a href="#analytics" onclick="toggleMobileMenu()" class="block text-slate-200 hover:text-amber-400 py-1">Аналитик & Чанар</a>
+            <a href="#simulator" onclick="toggleMobileMenu()" class="block text-slate-200 hover:text-amber-400 py-1">Симулятор</a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+        <!-- Hero Banner -->
+        <section class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+            <div class="relative z-10 max-w-4xl space-y-4">
+                <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                    <i class="fa-solid fa-diagram-project mr-1"></i> Төгсгөл Хүртэлх (End-to-End) Процессын Систем
+                </span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                    Маркетингаас Борлуулалт, Хүргэлт ба Халамж: <span class="text-amber-400">Салбар Бүрийн Бодит Процесс Мап</span>
+                </h1>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    Байгууллагын маркетинг, лид цуглуулалт, борлуулалтын хэлцэл, нэвтрүүлэлтээс эхлээд дараах үйлчилгээ хүртэлх бодит процессууд нь Хэрэглэгчийн Туршлагын (CX) **Үндсэн 4 Шаттай** (1. Хэрэгцээг таних, 2. Хүлээлтийг таних, 3. Хүлээлтийг удирдах, 4. Хэрэгцээнд нийцүүлэх) яг аль хэсэгт оногдож байгаад дүн шинжилгээ хийгээрэй.
+                </p>
+
+                <!-- Legend of 4 CX Steps -->
+                <div class="pt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div class="bg-amber-500/10 border border-amber-500/40 p-2.5 rounded-lg flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-amber-500 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-bold text-amber-300 block">Шат 1</span>
+                            <span class="text-slate-300 text-[11px]">Хэрэгцээг Таних</span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-500/10 border border-blue-500/40 p-2.5 rounded-lg flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-bold text-blue-300 block">Шат 2</span>
+                            <span class="text-slate-300 text-[11px]">Хүлээлтийг Таних</span>
+                        </div>
+                    </div>
+                    <div class="bg-purple-500/10 border border-purple-500/40 p-2.5 rounded-lg flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-purple-500 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-bold text-purple-300 block">Шат 3</span>
+                            <span class="text-slate-300 text-[11px]">Хүлээлтийг Удирдах</span>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-500/10 border border-emerald-500/40 p-2.5 rounded-lg flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                        <div>
+                            <span class="font-bold text-emerald-300 block">Шат 4</span>
+                            <span class="text-slate-300 text-[11px]">Хэрэгцээнд Нийцүүлэх</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: Industry Selector -->
+        <section id="industry-selector" class="space-y-4">
+            <div class="border-l-4 border-amber-500 pl-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">1. Байгууллага / Салбараа Сонгох</h2>
+                    <p class="text-slate-600 text-sm mt-0.5">Судлахыг хүссэн байгууллагынхаа чиглэлийг сонгосноор тухайн салбарын бүх үе шатны бодит процесс ба харгалзах CX карт харагдана.</p>
+                </div>
+                <span id="selectedIndustryBadge" class="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-3 py-1 rounded-full text-xs self-start sm:self-auto">
+                    Сонгосон: E-Commerce
+                </span>
+            </div>
+
+            <!-- Industry Grid Selector Buttons -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <button onclick="selectIndustry('ecommerce')" id="indBtn-ecommerce" class="ind-btn p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/80 shadow-md transition-all text-center flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-cart-shopping text-2xl text-amber-600"></i>
+                    <span class="font-bold text-xs text-slate-900">E-Commerce & Онлайн Дэлгүүр</span>
+                </button>
+                <button onclick="selectIndustry('banking')" id="indBtn-banking" class="ind-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-300 transition-all text-center flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-building-columns text-2xl text-slate-600"></i>
+                    <span class="font-bold text-xs text-slate-900">Банк & Санхүүгийн Байгууллага</span>
+                </button>
+                <button onclick="selectIndustry('saas')" id="indBtn-saas" class="ind-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-300 transition-all text-center flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-cloud-code text-2xl text-slate-600"></i>
+                    <span class="font-bold text-xs text-slate-900">B2B SaaS & IT Байгууллага</span>
+                </button>
+                <button onclick="selectIndustry('realestate')" id="indBtn-realestate" class="ind-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-300 transition-all text-center flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-city text-2xl text-slate-600"></i>
+                    <span class="font-bold text-xs text-slate-900">Үл Хөдлөх Хөрөнгө & Барилга</span>
+                </button>
+                <button onclick="selectIndustry('healthcare')" id="indBtn-healthcare" class="ind-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-300 transition-all text-center flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-user-doctor text-2xl text-slate-600"></i>
+                    <span class="font-bold text-xs text-slate-900">Эмнэлэг & Эрүүл Мэнд</span>
+                </button>
+                <button onclick="selectIndustry('auto')" id="indBtn-auto" class="ind-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-300 transition-all text-center flex flex-col items-center justify-center space-y-2">
+                    <i class="fa-solid fa-car text-2xl text-slate-600"></i>
+                    <span class="font-bold text-xs text-slate-900">Автомашин & Борлуулалт</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: End-to-End Interactive Process Mapper -->
+        <section id="process-mapper" class="space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-6">
+                <!-- Header of Mapper -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 id="industryTitle" class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sitemap text-amber-500"></i> E-Commerce-ийн Төгсгөл Хүртэлх Борлуулалтын Процесс
+                        </h3>
+                        <p id="industryDesc" class="text-xs text-slate-500 mt-1">
+                            Маркетингийн сурталчилгаанаас эхлэн вэбсайт зочлох, бараа сагслах, төлбөр, хүргэлт ба дараах сэтгэгдэл хүртэлх 6 үе шатны бодит алхмууд.
+                        </p>
+                    </div>
+
+                    <!-- Filter Controls by CX 4 Steps -->
+                    <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                        <span class="font-semibold text-slate-500 mr-1">CX Шүүлтүүр:</span>
+                        <button onclick="filterCxStep('all')" id="cxFilter-all" class="cx-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 text-white font-medium">Бүх Алхам</button>
+                        <button onclick="filterCxStep(1)" id="cxFilter-1" class="cx-filter-btn px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 hover:bg-amber-200 font-medium">1. Таних (Needs)</button>
+                        <button onclick="filterCxStep(2)" id="cxFilter-2" class="cx-filter-btn px-2.5 py-1 rounded-lg bg-blue-100 text-blue-900 hover:bg-blue-200 font-medium">2. Хүлээлт Таних</button>
+                        <button onclick="filterCxStep(3)" id="cxFilter-3" class="cx-filter-btn px-2.5 py-1 rounded-lg bg-purple-100 text-purple-900 hover:bg-purple-200 font-medium">3. Хүлээлт Удирдах</button>
+                        <button onclick="filterCxStep(4)" id="cxFilter-4" class="cx-filter-btn px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200 font-medium">4. Нийцүүлэх</button>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Interactive Timeline / Process Grid -->
+                <div id="processContainer" class="space-y-6">
+                    <!-- Dynamic process steps rendered via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Side-by-side CX 4 Steps Summary Matrix -->
+        <section id="cx-4step-summary" class="space-y-6">
+            <div class="border-l-4 border-indigo-600 pl-4">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">3. Сонгосон Салбарын CX 4 Шатны Нэгдсэн Матриц</h2>
+                <p class="text-slate-600 text-sm mt-0.5">Тухайн байгууллагын бүх борлуулалтын процессууд CX-ийн аль 4 шатанд хуваарилагдаж, ямар онолын эрсдэл дагуулж байгааг нэг дороос харьцуулан харна уу.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Column 1: Needs Identification -->
+                <div class="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between border-b border-amber-200 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <h4 class="font-bold text-amber-950 text-sm">ШАТ 1: Хэрэгцээг Таних</h4>
+                        </div>
+                        <span id="badgeCount1" class="bg-amber-200 text-amber-900 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <p class="text-xs text-amber-900/80 leading-relaxed">
+                        Маркетинг & Судалгаа: Хэрэглэгч юу хайж, ямар асуудал шийдэхийг хүсэж байгааг илрүүлэх.
+                    </p>
+                    <div id="cxList1" class="space-y-2 flex-grow">
+                        <!-- Dynamic list -->
+                    </div>
+                </div>
+
+                <!-- Column 2: Expectations Identification -->
+                <div class="bg-blue-50/60 border border-blue-200 rounded-2xl p-4 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between border-b border-blue-200 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                            <h4 class="font-bold text-blue-950 text-sm">ШАТ 2: Хүлээлтийг Таних</h4>
+                        </div>
+                        <span id="badgeCount2" class="bg-blue-200 text-blue-900 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <p class="text-xs text-blue-900/80 leading-relaxed">
+                        Сонголт & Харьцуулалт: Хэрэглэгчийн сэтгэлд буусан чанар, хугацаа, үнийн стандартыг таних.
+                    </p>
+                    <div id="cxList2" class="space-y-2 flex-grow">
+                        <!-- Dynamic list -->
+                    </div>
+                </div>
+
+                <!-- Column 3: Managing Expectations -->
+                <div class="bg-purple-50/60 border border-purple-200 rounded-2xl p-4 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between border-b border-purple-200 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                            <h4 class="font-bold text-purple-950 text-sm">ШАТ 3: Хүлээлтийг Удирдах</h4>
+                        </div>
+                        <span id="badgeCount3" class="bg-purple-200 text-purple-900 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <p class="text-xs text-purple-900/80 leading-relaxed">
+                        Гэрээ & Борлуулалт: Хэтрүүлж амлахгүйгээр бодит хугацаа ба нөхцөлийг тусгах.
+                    </p>
+                    <div id="cxList3" class="space-y-2 flex-grow">
+                        <!-- Dynamic list -->
+                    </div>
+                </div>
+
+                <!-- Column 4: Fulfilling Needs -->
+                <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            <h4 class="font-bold text-emerald-950 text-sm">ШАТ 4: Хэрэгцээнд Нийцүүлэх</h4>
+                        </div>
+                        <span id="badgeCount4" class="bg-emerald-200 text-emerald-900 text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <p class="text-xs text-emerald-900/80 leading-relaxed">
+                        Хүргэлт & Дараах Халамж: Амласан үнэ цэнээ гүйцэтгэж, алдаагүй, эмпатитай хүргэх.
+                    </p>
+                    <div id="cxList4" class="space-y-2 flex-grow">
+                        <!-- Dynamic list -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Analytics & Theory Visualizations -->
+        <section id="analytics" class="space-y-6">
+            <div class="border-l-4 border-teal-600 pl-4">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">4. Салбарын CX Эрсдэл ба Процессын Дүн Шинжилгээ</h2>
+                <p class="text-slate-600 text-sm mt-0.5">Сонгосон салбарын процессын алхам тус бүрт ажиглагдах Gap Model-ийн эрсдэлүүд болон RATER хэмжигдэхүүний жингийн хуваарилалт.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Chart 1: Process Stage vs CX Step Distribution -->
+                <div class="lg:col-span-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Борлуулалтын Шатууд дахь CX Процессын Эзлэх Хувь</h3>
+                        <p class="text-xs text-slate-500 mb-4">Тухайн салбарын үйл ажиллагаа хаана илүү төвлөрч байгааг харуулна.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="cxDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Potential Gap Model Risks -->
+                <div class="lg:col-span-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Салбар Доторх Gap 1-5 Эрсдэлийн Түвшин</h3>
+                        <p class="text-xs text-slate-500 mb-4">Борлуулалтын суваг дахь гол саатал үүсдэг зөрүүний оношлогоо.</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="gapRiskChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Dynamic Scenario Simulator -->
+        <section id="simulator" class="space-y-6">
+            <div class="border-l-4 border-amber-500 pl-4">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">5. Борлуулалтын Амлалт ба Бодит Чанарын Симулятор</h2>
+                <p class="text-slate-600 text-sm mt-0.5">Маркетингийн амлалт (Expectation) болон Бодит борлуулалт/хүргэлтийн чанарыг (Performance) тохируулан Оливерийн EDT онолоор сэтгэл ханамжийг бодож үзээрэй.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls Column -->
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm font-bold">
+                            <span>1. Маркетинг & Борлуулалтын Өгсөн Амлалт:</span>
+                            <span id="simExpVal" class="text-amber-600 font-extrabold">70%</span>
+                        </div>
+                        <input type="range" id="simExpSlider" min="10" max="100" value="70" oninput="calculateSimulation()" class="w-full accent-amber-500 cursor-pointer">
+                        <p class="text-xs text-slate-400">Реклам, борлуулалтын менежерийн хэрэглэгчид өгсөн хүлээлт ба амлалтын түвшин.</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm font-bold">
+                            <span>2. Бүтээгдэхүүн / Үйлчилгээний Бодит Гүйцэтгэл:</span>
+                            <span id="simPerfVal" class="text-teal-600 font-extrabold">85%</span>
+                        </div>
+                        <input type="range" id="simPerfSlider" min="10" max="100" value="85" oninput="calculateSimulation()" class="w-full accent-teal-600 cursor-pointer">
+                        <p class="text-xs text-slate-400">Хүргэлтийн хурд, барааны чанар, ажилтны бодит тусламж ба гүйцэтгэл.</p>
+                    </div>
+
+                    <div id="simResultBox" class="p-4 rounded-xl border bg-emerald-50 border-emerald-200 space-y-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Тооцоолсон Үр Дүн (EDT Онол):</span>
+                        <h4 id="simResultTitle" class="text-base sm:text-lg font-bold text-emerald-800">Эерэг үр дүн (Positive Disconfirmation) ★★★</h4>
+                        <p id="simResultDesc" class="text-xs text-slate-700 leading-relaxed">
+                            Бодит гүйцэтгэл маркетингийн амлалтаас даван гарлаа. Хэрэглэгчид баярлах ба брэндэд үнэнч лоял хэрэглэгч болох магадлал маш өндөр байна.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Simulation Visual Chart -->
+                <div class="lg:col-span-6 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between items-center">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Хүлээлт vs Бодит Чанарын Тэнцвэр</h4>
+                    <div class="chart-container">
+                        <canvas id="simChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <p class="font-semibold text-slate-300">CX Салбаруудын Интерактив Процесс Систем © 2026</p>
+                <p class="text-slate-500 mt-0.5">Маркетингаас борлуулалт, хүргэлт хүртэлх 4 үндсэн шат ба онолын маппинг</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#industry-selector" class="hover:text-amber-400">Салбар Сонгох</a>
+                <a href="#process-mapper" class="hover:text-amber-400">Процесс Мап</a>
+                <a href="#cx-4step-summary" class="hover:text-amber-400">CX Матриц</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Global Industry Database (Rich End-to-End Processes)
+        var industryData = {
+            ecommerce: {
+                name: "E-Commerce & Онлайн Дэлгүүр",
+                title: "E-Commerce-ийн Төгсгөл Хүртэлх Борлуулалтын Процесс",
+                desc: "Сошиал медиа сурталчилгаа, вэбсайт зочлох, бараа сонгох, сагслах, касс дээр төлбөр хийх, агуулахын савлагаа, хүргэлт ба дараах сэтгэгдэл цуглуулах процесс.",
+                steps: [
+                    {
+                        stage: "1. Маркетинг & Илрүүлэлт",
+                        stepName: "Сошиал Ретаргетинг & Тархижуулах Сурталчилгаа",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано - Performance / Must-be & Gap 1",
+                        risk: "Хэрэглэгчийн сонирхож буй асуудлыг буруу оношлох, эсвэл хамааралгүй рекламаар залхаах (Gap 1).",
+                        action: "FB/Instagram пиксел ба AI зөвлөмжөөр хэрэглэгчийн яг одоо хайж байгаа барааг таньж харуулах."
+                    },
+                    {
+                        stage: "2. Борлуулалтын Өмнөх & Сонголт",
+                        stepName: "Вэбсайт дээр Барааны Мэдээлэл ба Сэтгэгдэл Харах",
+                        cxStep: 2,
+                        cxTitle: "Шат 2: Хүлээлтийг Таних",
+                        theory: "RATER - Tangibles & Gap 2",
+                        risk: "Барааны бодит хэмжээ, өнгө, материал тайлбартайгаа таарахгүй байх. Зураг нь хэт гоё чанартай фотошоптой байх.",
+                        action: "Бодит хэрэглэгчийн зурагтай сэтгэгдлүүд (UGC) болон хэмжээний нарийвчилсан хүснэгтийг тодорхой байршуулах."
+                    },
+                    {
+                        stage: "3. Хэлцэл & Төлбөр Хийх",
+                        stepName: "Сагсанд Хийх, Хүргэлтийн Хугацаа сонгох ба Төлбөр",
+                        cxStep: 3,
+                        cxTitle: "Шат 3: Хүлээлтийг Удирдах",
+                        theory: "EDT Онол & Gap 4 (Харилцааны зөрүү)",
+                        risk: "Төлбөр төлсний дараа 'Хүргэлт 24 цагт очно' гэж амлаад бодит байдал дээр агуулахад бараа дууссан байх.",
+                        action: "Агуулахын үлдэгдлийг real-time системтэй холбож, хүргэлтийн бодит цагийг сафер (buffer) хугацаатай сануулах."
+                    },
+                    {
+                        stage: "4. Бараа Бэлтгэл & Хүргэлт",
+                        stepName: "Агуулахын савлагаа ба Хүргэлтийн жолооч бараа хүргэх",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Service Blueprint & RATER Reliability",
+                        risk: "Бараа гэмтэлтэй очсон, эсвэл хүргэлтийн жолооч бүдүүлэг харилцах (Gap 3 - Delivery Gap).",
+                        action: "Барааг аюулгүй савлах, SMS-ээр хүргэлтийн тракинг линк илгээх, жолоочид харилцааны стандарт сургалт оруулах."
+                    },
+                    {
+                        stage: "5. Борлуулалтын Дараах Үйлчилгээ",
+                        stepName: "Бараа Буцаалт & Гэмтэлтэй Барааны Гомдол Шийдвэрлэх",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "RATER Empathy & Responsiveness",
+                        risk: "Хэрэглэгч бараа буцаах гэхэд чатбот эсвэл оператор удаан хариулж, хүндрэл учруулах.",
+                        action: "Асуудалгүй 7 хоногийн буцаалтын тодорхой нөхцөлтэй байх, шууд чатаар 5 минутад хариу өгөх."
+                    },
+                    {
+                        stage: "6. Лоялти ба Дахин Худалдан Авалт",
+                        stepName: "Бонус Дүн Цуглуулах ба Дахин Санал Болгох SMS",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Delighters & EDT Positive",
+                        risk: "Хэрэглэгчийг спам мессежээр бөмбөгдөх.",
+                        action: "Дараагийн худалдан авалтад ашиглаж болох кэшбэк оноо өгч, хувийн хэрэгцээнд нь таарсан хөнгөлөлт санал болгох."
+                    }
+                ]
+            },
+            banking: {
+                name: "Банк & Санхүүгийн Байгууллага",
+                title: "Банкны Зээл ба Хадгаламжийн Төгсгөл Хүртэлх Процесс",
+                desc: "Санхүүгийн хэрэгцээ тодорхойлох, зээлийн хүсэлт авах, скоринг бодох, шийдвэр гаргах, шаардлагатай бичиг баримт бүрдүүлэх, зээл олгох ба дараах эргэн төлөвлөлт.",
+                steps: [
+                    {
+                        stage: "1. Маркетинг & Илрүүлэлт",
+                        stepName: "Орон сууц болон Бизнесийн Зээлийн Сурталчилгаа",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Must-be & Gap 1",
+                        risk: "Хэрэглэгчийн санхүүгийн бодит ачааллыг тооцохгүйгээр хэт бага хүүтэй гэж төөрөгдүүлэх.",
+                        action: "Вэбсайт ба апп дээр зээлийн тооцоолуур байршуулж, сарын төлбөрийн бодит зураглалыг харуулах."
+                    },
+                    {
+                        stage: "2. Борлуулалтын Өмнөх Сонголт",
+                        stepName: "Аппликейшн эсвэл Салбар дээр Зээлийн Нөхцөлтэй Танилцах",
+                        cxStep: 2,
+                        cxTitle: "Шат 2: Хүлээлтийг Таних",
+                        theory: "RATER Assurance & Tangibles",
+                        risk: "Зээлийн шимтгэл, далд хураамжуудыг анхнаас нь тодорхой тайлбарлахгүй нуух.",
+                        action: "Нэг хуудас бүхий ил тод нөхцөлийн баримт бичиг болон FAQ бэлтгэх."
+                    },
+                    {
+                        stage: "3. Зээлийн Хүсэлт ба Шалгалт",
+                        stepName: "Аппаар эсвэл салбарт хүсэлт өгөх, Зээлийн скоринг хийх",
+                        cxStep: 3,
+                        cxTitle: "Шат 3: Хүлээлтийг Удирдах",
+                        theory: "EDT & Gap 4 (Харилцааны зөрүү)",
+                        risk: "'10 минутад гарна' гэж сурталчилчихаад бодит байдал дээр 3 хоног материал шаардах.",
+                        action: "Шалгагдаж буй шат дамжлагыг апп дээр төлөв байдлаар (Status Tracker) шууд харуулж удирдах."
+                    },
+                    {
+                        stage: "4. Гэрээ Бa Зээл Олголт",
+                        stepName: "Нотariat ба Зээлийн Дансанд Мөнгө Орох Process",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Service Blueprint & RATER Reliability",
+                        risk: "Мөнгө шилжих үед систем саатах эсвэл гэрээний заалт дээр үл ойлголцол үүсэх.",
+                        action: "Цахим гарын үсгээр салбарт очихгүйгээр гэрээ байгуулах ба шууд дансанд шилжүүлэх."
+                    },
+                    {
+                        stage: "5. Эргэн Төлөлт ба Дэмжлэг",
+                        stepName: "Сарын Төлбөрийн Сануулга & Автомат Төлөлт",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "RATER Empathy & Responsiveness",
+                        risk: "Хугацаа хэтэрмэгц шууд торгууль ногдуулж, сөрөг харилцаа үүсгэх.",
+                        action: "Төлөх хугацаанаас 3 хоногийн өмнө найрсгаар сануулах, шаардлагатай бол дахин бүтэцчлэх боломж олгох."
+                    },
+                    {
+                        stage: "6. Харилцаа Гүнзгийрүүлэх",
+                        stepName: "VIP Хадгаламж ба Хөрөнгө Оруулалтын Санал",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Delighters",
+                        risk: "Үнэнч хэрэглэгчдийг урамшуулахгүй байх.",
+                        action: "Зээлээ сайн төлсөн хэрэглэгчид хүүгийн хөнгөлөлт болон VIP үйлчилгээ санал болгох."
+                    }
+                ]
+            },
+            saas: {
+                name: "B2B SaaS & IT Байгууллага",
+                title: "B2B Программ Хангамж Борлуулах ба Нэвтрүүлэх Процесс",
+                desc: "Inbound/Outbound маркетингийн лид олох, Демо танилцуулга, Туршилтын хугацаа (Trial), Борлуулалтын гэрээ, Нэвтрүүлэлт (Onboarding) ба Дараах Customer Success сунгалт.",
+                steps: [
+                    {
+                        stage: "1. Маркетинг & Лид Олох",
+                        stepName: "Вэбинар, Контент Маркетинг & Демо Хүсэлт Захиалах",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Performance & Gap 1",
+                        risk: "Байгууллагын процессын бодит асуудлыг бус зөвхөн программынхаа функцуудыг рекламдах.",
+                        action: "Салбар бүрийн Case Study болон ROI тооцоолуур бүхий кэйсүүд бэлтгэх."
+                    },
+                    {
+                        stage: "2. Демо Танилцуулга",
+                        stepName: "Борлуулалтын Менежертэй Уулзах & Демо Үзүүлэх",
+                        cxStep: 2,
+                        cxTitle: "Шат 2: Хүлээлтийг Таних",
+                        theory: "RATER Assurance & Tangibles",
+                        risk: "Байгууллагын захирлын хүсэн хүлээж буй тайлан, аналитикийг программ хийж чадахгүй байх.",
+                        action: "Асуулгаар хэрэглэгчийн одоогийн процессын гацааг оношилж, яг түүнд тохирсон Демо бэлтгэх."
+                    },
+                    {
+                        stage: "3. Хэлцэл ба Гэрээ",
+                        stepName: "Үнийн Санал, Тарифын Сонголт ба SLA Гэрээ Байгуулах",
+                        cxStep: 3,
+                        cxTitle: "Шат 3: Хүлээлтийг Удирдах",
+                        theory: "EDT Онол & Gap 4",
+                        risk: "Программд байхгүй функцыг 'Хэдэн сарын дараа хийгдэнэ' гэж хэтрүүлэн амлаж гэрээ хийх.",
+                        action: "Бүтээгдэхүүний хөгжүүлэлтийн бодит Roadmap-ийг ил тод харуулж, нэвтрүүлэх хугацааг үнэнээр тохирох."
+                    },
+                    {
+                        stage: "4. Систем Нэвтрүүлэлт (Onboarding)",
+                        stepName: "Дата Миграци хийх, Ажилтнуудыг Сургах & Анхны Тохиргоо",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Service Blueprint Backstage & Onstage",
+                        risk: "Нэвтрүүлэлт удаашрах, хэрэглэгчийн ажилтнууд программ дээр ажиллаж чадахгүй шантрах.",
+                        action: "Dedicated Customer Success Менежер томилж, алхам алхмаар чиглүүлэх зааварчилгаа видео өгөх."
+                    },
+                    {
+                        stage: "5. Техник Тусламж ба CSAT",
+                        stepName: "24/7 Чат Болон Тикет Системээр Тусламж Авах",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "RATER Responsiveness & Reliability",
+                        risk: "Системийн саатал гарах үед инженерүүд хариу өгөхгүй удах (Gap 3).",
+                        action: "SLA-д заасан 15 минутын дотор анхны хариу өгөх ба статусыг шууд мэдээлэх."
+                    },
+                    {
+                        stage: "6. Гэрээ Сунгалт ба Upsell",
+                        stepName: "Жилийн Гэрээ Сунгах & Шинэ Модуль Санал Болгох",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Delighters & Positive Disconfirmation",
+                        risk: "Зөвхөн гэрээ сунгах дөхөхөөр л харилцах.",
+                        action: "У улирал бүр бизнесийн үр дүнгийн тайлан танилцуулж, нэмэлт үнэ цэнэ санал болгох."
+                    }
+                ]
+            },
+            realestate: {
+                name: "Үл Хөдлөх Хөрөнгө & Барилга",
+                title: "Орон Сууц Борлуулах ба Ашиглалтад Оруулах Төгсгөл Хүртэлх Процесс",
+                desc: "Төслийн нээлт, Маркетинг, Борлуулалтын алба дээр загварын байр үзэх, Захиалгын гэрээ хийх, Барилгын явц мэдээлэх, Түлхүүр гардуулах ба СӨХ-ийн дараах үйлчилгээ.",
+                steps: [
+                    {
+                        stage: "1. Маркетинг & Нээлт",
+                        stepName: "3D Виртуал Тур & Төслийн Танилцуулга Реклам",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Must-be & Gap 1",
+                        risk: "Байршил, сургууль цэцэрлэгийн зайг худал мэдээлэх.",
+                        action: "3D тууштай рендер ба орчны дэд бүтцийн бодит зураглалыг харуулах."
+                    },
+                    {
+                        stage: "2. Борлуулалтын Уулзалт",
+                        stepName: "Загварын Байраар Зочлох & Макет Үзэх",
+                        cxStep: 2,
+                        cxTitle: "Шат 2: Хүлээлтийг Таних",
+                        theory: "RATER Tangibles & Assurance",
+                        risk: "Загварын байранд ашигласан материал нь бодит байран дээрээ чанаргүй материалаар солигдох.",
+                        action: "Ашиглагдах брендийн тоноглолуудын жагсаалтыг гэрээнд нээлттэй хавсаргах."
+                    },
+                    {
+                        stage: "3. Урьдчилгаа Төлбөр & Гэрээ",
+                        stepName: "Захиалгын Гэрээ Баталгаажуулах & График Төлөвлөх",
+                        cxStep: 3,
+                        cxTitle: "Шат 3: Хүлээлтийг Удирдах",
+                        theory: "EDT Онол & Gap 4",
+                        risk: "Барилга ашиглалтад орох хугацааг 6 сараар амлачихаад 2 жил саатах.",
+                        action: "Барилгын явцын эрсдэлийн буфер хугацааг гэрээнд тусгаж, сар бүр видео тайлан илгээх."
+                    },
+                    {
+                        stage: "4. Ашиглалтад Орох & Түлхүүр Гардуулах",
+                        stepName: "Улсын Комисс хүлээж авах & Түлхүүр Гардуулах Ёслол",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Service Blueprint & RATER Reliability",
+                        risk: "Байр ашиглалтад ороход цонхны резин сийгэх, сантехникийн гоожилт байх.",
+                        action: "Хүлээлцэх комисс байгуулж, оршин суугчтай хамт 50 заалтаар шалгаж хүлээлгэн өгөх."
+                    },
+                    {
+                        stage: "5. Гомдол & Баталгаат Засвар",
+                        stepName: "1 Жилийн Баталгаат Хугацааны Засварын Хүсэлт",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "RATER Responsiveness",
+                        risk: "Сантехникийн аваари гарахад инженерүүд ирэхгүй удах.",
+                        action: "СӨХ болон Барилгын инженерүүдийн шуурхай ажлын хэсгийг 24/7 ажиллуулах."
+                    },
+                    {
+                        stage: "6. СӨХ ба Нийтлэг Орчин",
+                        stepName: "СӨХ-ийн Үйлчилгээ & Оршин Суугчдын Клуб",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Delighters",
+                        risk: "Ашиглалтад орсны дараа СӨХ барилга зарах компани хоёр бие бие рүүгээ буруугаа чихэх.",
+                        action: "СӨХ-ийн менежментийг анхнаас нь стандартжуулж, оршин суугчдын эвент арга хэмжээ зохиох."
+                    }
+                ]
+            },
+            healthcare: {
+                name: "Эмнэлэг & Эрүүл Мэнд",
+                title: "Эмнэлгийн Үйлчилгээний Төгсгөл Хүртэлх Процесс",
+                desc: "Шинжүүлэх хэрэгцээ бий болох, Цаг захиалга, Эмнэлэг дээр ирж бүртгүүлэх, Эмчийн үзлэг & Оновчтой оношилгоо, Эмчилгээний төлөвлөгөө ба Дараах хяналт.",
+                steps: [
+                    {
+                        stage: "1. Маркетинг & Мэдээлэл",
+                        stepName: "Эмчийн Мэргэшсэн Чадвар & Эрүүл Мэндийн Зөвлөгөө Контент",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Must-be & Gap 1",
+                        risk: "Симптомыг хэт айдас төрүүлэх хэлбэрээр сурталчлах.",
+                        action: "Эмч нарын туршлага, бодит зөвлөгөө бүхий видео болон нийтлэлүүд хүргэх."
+                    },
+                    {
+                        stage: "2. Цаг Захиалга",
+                        stepName: "Онлайн Вэб/Call Center-ээр Цаг Захиалах",
+                        cxStep: 2,
+                        cxTitle: "Шат 2: Хүлээлтийг Таних",
+                        theory: "RATER Responsiveness & Tangibles",
+                        risk: "Утас нь холбогдохгүй байх, цаг захиалсан ч эмнэлэг дээр ирэхэд дахин очерлох.",
+                        action: "Апп ба вэбээр 24/7 цаг шууд захиалах ба SMS сануулга илгээх."
+                    },
+                    {
+                        stage: "3. Хүлээлгийн Хэсэг & Бүртгэл",
+                        stepName: "Эмнэлэгт Ирэх, Хүлээлгийн өрөө ба Дараалал",
+                        cxStep: 3,
+                        cxTitle: "Шат 3: Хүлээлтийг Удирдах",
+                        theory: "EDT Онол & Gap 4",
+                        risk: "'14:00 цагт үзүүлнэ' гэсэн боловч 1.5 цаг хүлээлгэж өчтөнг бухимдуулах.",
+                        action: "Хүлээлгийн танхимд дэлгэцээр дарааллын төлөвийг тодорхой харуулж, саатлыг урьдчилан мэдээлэх."
+                    },
+                    {
+                        stage: "4. Эмчийн Үзлэг ба Оношилгоо",
+                        stepName: "Эмч Үзэх, Шинжилгээ Авах ба Зөвлөгөө Өгөх",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "RATER Empathy & Assurance",
+                        risk: "Эмч өвчтөнд анхаарал тавихгүй хурдан явуулахыг бодох, харилцааны дутагдал.",
+                        action: "Өвчтөнд зориулсан 15-20 минутын чанартай уулзалт, эмпатитай харилцааг хэвшүүлэх."
+                    },
+                    {
+                        stage: "5. Эмчилгээний Төлөвлөгөө",
+                        stepName: "Эмийн жор өгөх ба Шинжилгээний Хариу Илгээх",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Service Blueprint & RATER Reliability",
+                        risk: "Шинжилгээний хариу андуурагдах эсвэл цагтаа гарахгүй байх.",
+                        action: "Шинжилгээний хариуг шууд өвчтөний апп руу нууцлалтайгаар илгээж, ойлгомжтой тайлбарлах."
+                    },
+                    {
+                        stage: "6. Эргэх Холбоо ба Давтан Үзлэг",
+                        stepName: "Эмчилгээний Нөлөөг Асууж Сураглах Call & Давтан цаг",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Delighters & Positive EDT",
+                        risk: "Үзлэгийн дараа өвчтөнийг орхих.",
+                        action: "Үзлэгээс 3 хоногийн дараа сувилагч залгаж биеийн байдлыг асуух."
+                    }
+                ]
+            },
+            auto: {
+                name: "Автомашин & Борлуулалт",
+                title: "Шинэ Автомашин Борлуулах ба Засварын Төгсгөл Хүртэлх Процесс",
+                desc: "Шоурум зочлох, Тест драйв хийх, Санхүүгийн лизинг тохирох, Машин гардуулах ёслол ба 3-5 жилийн баталгаат засвар үйлчилгээ.",
+                steps: [
+                    {
+                        stage: "1. Маркетинг & Түр Налайх",
+                        stepName: "Шинэ Загварын Шоурум Нээлт & Сошиал Видео",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Must-be & Gap 1",
+                        risk: "Машины шатахуун зарцуулалт болон тоноглолыг зөрүүтэй мэдээлэх.",
+                        action: "Бодит замын тест видео болон шатахуун эдийн засгийн нарийвчилсан тооцоог харуулах."
+                    },
+                    {
+                        stage: "2. Шоурум Зочлох & Тест Драйв",
+                        stepName: "Автомашин Унаж Үзэх (Test Drive) ба Зөвлөгөө",
+                        cxStep: 2,
+                        cxTitle: "Шат 2: Хүлээлтийг Таних",
+                        theory: "RATER Tangibles & Assurance",
+                        risk: "Борлуулагч машины техникийн мэдлэг дутуу байх эсвэл тухайн өдөр тест драйв хийх боломжгүй байх.",
+                        action: "Онлайнаар тест драйвын цаг урьдчилан захиалж, бэлтгэсэн туршлагатай борлуулагч угтах."
+                    },
+                    {
+                        stage: "3. Хэлцэл ба Нөхцөл Тохирох",
+                        stepName: "Банкны Лизинг Баталгаажуулах & Нэмэлт Тоноглол Сонгох",
+                        cxStep: 3,
+                        cxTitle: "Шат 3: Хүлээлтийг Удирдах",
+                        theory: "EDT Онол & Gap 4",
+                        risk: "Машин нийлүүлэгдэх хугацааг 1 сар гэж амлаад үйлдвэрээс саатаж 4 сар болох.",
+                        action: "Вин кодоор машиных нь далайд эсвэл хил дээр яваа тракингийг хэрэглэгчид харуулах."
+                    },
+                    {
+                        stage: "4. Машин Гардуулах Ёслол",
+                        stepName: "Шоурумд Улаан Төрз Дээгүүр Алхуулж Түлхүүр Гардуулах",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Кано Delighters & Positive Disconfirmation",
+                        risk: "Машин тоосжсон байх, шатахуун нь дуусах дөхсөн байх.",
+                        action: "Машиныг бүрэн угааж, дүүрэн шатахуунтай, дурсгалын бэлэгтэйгээр баяр ёслолын байдалтай гардуулах."
+                    },
+                    {
+                        stage: "5. Засвар Үйлчилгээ ба Тос Солилто",
+                        stepName: "Брэнд Сервис Төв дээр Баталгаат Засвар Хийлгэх",
+                        cxStep: 4,
+                        cxTitle: "Шат 4: Хэрэгцээнд Нийцүүлэх",
+                        theory: "Service Blueprint & RATER Reliability",
+                        risk: "Засварын сэргэг ваар сэвтэх, сэвтэй эд анги буруу солих.",
+                        action: "Засварын өрөөг шилэн тусгаарлагчтай хийж, хүлээлгийн танхимаас шууд харах боломж олгох."
+                    },
+                    {
+                        stage: "6. Тэвчээртэй Худалдан Авалт (Trade-In)",
+                        stepName: "3 Жилийн Дараа Хуучин Машиныг нь Худалдан Авч Шинэчлэх",
+                        cxStep: 1,
+                        cxTitle: "Шат 1: Хэрэгцээг Таних",
+                        theory: "Кано Delighters",
+                        risk: "Хуучин машиныг нь хэт хямд үнэлж сөрөг сэтгэгдэл үүсгэх.",
+                        action: "Trade-in шударга үнэлгээний стандарт хэрэгжүүлж, шинэ машинд нь тусгай хөнгөлөлт үзүүлэх."
+                    }
+                ]
+            }
+        };
+
+        // Current Active State
+        var currentIndustryKey = 'ecommerce';
+        var currentFilterStep = 'all';
+
+        // Chart Instances
+        var cxDistChartInstance = null;
+        var gapRiskChartInstance = null;
+        var simChartInstance = null;
+
+        function selectIndustry(key) {
+            currentIndustryKey = key;
+
+            // Update Industry Buttons Styling
+            var keys = Object.keys(industryData);
+            for (var i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                var btn = document.getElementById('indBtn-' + k);
+                if (k === key) {
+                    btn.className = "ind-btn p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/80 shadow-md transition-all text-center flex flex-col items-center justify-center space-y-2";
+                    var icon = btn.querySelector('i');
+                    if(icon) icon.className = icon.className.replace('text-slate-600', 'text-amber-600');
+                } else {
+                    btn.className = "ind-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white hover:border-amber-300 transition-all text-center flex flex-col items-center justify-center space-y-2";
+                    var icon = btn.querySelector('i');
+                    if(icon) icon.className = icon.className.replace('text-amber-600', 'text-slate-600');
+                }
+            }
+
+            var ind = industryData[key];
+            document.getElementById('selectedIndustryBadge').innerText = "Сонгосон: " + ind.name;
+            document.getElementById('industryTitle').innerHTML = '<i class="fa-solid fa-sitemap text-amber-500"></i> ' + ind.title;
+            document.getElementById('industryDesc').innerText = ind.desc;
+
+            // Reset Filter
+            currentFilterStep = 'all';
+            updateCxFilterButtons();
+
+            // Render Views
+            renderProcessSteps();
+            renderCx4StepSummary();
+            updateCharts();
+        }
+
+        function filterCxStep(step) {
+            currentFilterStep = step;
+            updateCxFilterButtons();
+            renderProcessSteps();
+        }
+
+        function updateCxFilterButtons() {
+            var filterIds = ['all', '1', '2', '3', '4'];
+            for (var i = 0; i < filterIds.length; i++) {
+                var id = filterIds[i];
+                var btn = document.getElementById('cxFilter-' + id);
+                if (!btn) continue;
+                if ((id === 'all' && currentFilterStep === 'all') || (id == currentFilterStep)) {
+                    btn.className = "cx-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 text-white font-medium shadow-sm";
+                } else {
+                    btn.className = "cx-filter-btn px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium";
+                }
+            }
+        }
+
+        function renderProcessSteps() {
+            var ind = industryData[currentIndustryKey];
+            var container = document.getElementById('processContainer');
+            var html = '';
+
+            var stepBadgeColors = {
+                1: "bg-amber-100 text-amber-900 border-amber-300",
+                2: "bg-blue-100 text-blue-900 border-blue-300",
+                3: "bg-purple-100 text-purple-900 border-purple-300",
+                4: "bg-emerald-100 text-emerald-900 border-emerald-300"
+            };
+
+            var stepBorderLeft = {
+                1: "border-l-amber-500",
+                2: "border-l-blue-500",
+                3: "border-l-purple-500",
+                4: "border-l-emerald-500"
+            };
+
+            var filteredCount = 0;
+
+            for (var i = 0; i < ind.steps.length; i++) {
+                var item = ind.steps[i];
+
+                if (currentFilterStep !== 'all' && item.cxStep != currentFilterStep) {
+                    continue;
+                }
+                filteredCount++;
+
+                var badgeClass = stepBadgeColors[item.cxStep] || "bg-slate-100 text-slate-800";
+                var borderLeftClass = stepBorderLeft[item.cxStep] || "border-l-slate-400";
+
+                html += '<div class="border-l-4 ' + borderLeftClass + ' bg-slate-50/70 border border-slate-200/80 rounded-r-2xl p-4 sm:p-5 transition-all hover:bg-white hover:shadow-md">' +
+                    '<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200/60 pb-3">' +
+                        '<div class="flex items-center space-x-3">' +
+                            '<span class="w-7 h-7 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">' + (i + 1) + '</span>' +
+                            '<div>' +
+                                '<span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">' + item.stage + '</span>' +
+                                '<h4 class="font-bold text-slate-900 text-sm sm:text-base">' + item.stepName + '</h4>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="flex flex-wrap items-center gap-2">' +
+                            '<span class="border px-3 py-1 rounded-full text-xs font-extrabold ' + badgeClass + '">' +
+                                '<i class="fa-solid fa-circle text-[8px] mr-1"></i> ' + item.cxTitle +
+                            '</span>' +
+                            '<span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-full font-medium">' +
+                                '<i class="fa-solid fa-bookmark text-slate-500 mr-1"></i> ' + item.theory +
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 text-xs">' +
+                        '<div class="bg-red-50/80 border border-red-200/80 p-3 rounded-xl space-y-1">' +
+                            '<span class="font-bold text-red-900 block flex items-center gap-1.5">' +
+                                '<i class="fa-solid fa-triangle-exclamation text-red-600"></i> Алхам дээрх Саатал ба Онолын Эрсдэл:' +
+                            '</span>' +
+                            '<p class="text-red-950/80 leading-relaxed">' + item.risk + '</p>' +
+                        '</div>' +
+                        '<div class="bg-emerald-50/80 border border-emerald-200/80 p-3 rounded-xl space-y-1">' +
+                            '<span class="font-bold text-emerald-900 block flex items-center gap-1.5">' +
+                                '<i class="fa-solid fa-circle-check text-emerald-600"></i> CX Шийдэл ба Практик Алхам:' +
+                            '</span>' +
+                            '<p class="text-emerald-950/80 leading-relaxed">' + item.action + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            if (filteredCount === 0) {
+                html = '<div class="p-8 text-center text-slate-400 text-sm">Сонгосон CX Шүүлтүүрт харгалзах алхам одоогоор байхгүй байна.</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function renderCx4StepSummary() {
+            var ind = industryData[currentIndustryKey];
+
+            var list1 = [], list2 = [], list3 = [], list4 = [];
+
+            for (var i = 0; i < ind.steps.length; i++) {
+                var s = ind.steps[i];
+                var cardHtml = '<div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs text-xs space-y-1">' +
+                    '<strong class="text-slate-900 font-bold block">' + s.stepName + '</strong>' +
+                    '<span class="text-[10px] text-slate-500 block">Үе: ' + s.stage + '</span>' +
+                    '<div class="text-[11px] text-slate-600 border-t border-slate-100 pt-1 mt-1">' +
+                        '<i class="fa-solid fa-circle-info text-amber-500 mr-1"></i> ' + s.theory +
+                    '</div>' +
+                '</div>';
+
+                if (s.cxStep === 1) list1.push(cardHtml);
+                if (s.cxStep === 2) list2.push(cardHtml);
+                if (s.cxStep === 3) list3.push(cardHtml);
+                if (s.cxStep === 4) list4.push(cardHtml);
+            }
+
+            document.getElementById('badgeCount1').innerText = list1.length;
+            document.getElementById('badgeCount2').innerText = list2.length;
+            document.getElementById('badgeCount3').innerText = list3.length;
+            document.getElementById('badgeCount4').innerText = list4.length;
+
+            document.getElementById('cxList1').innerHTML = list1.join('') || '<p class="text-[11px] text-slate-400 italic">Алхам байхгүй</p>';
+            document.getElementById('cxList2').innerHTML = list2.join('') || '<p class="text-[11px] text-slate-400 italic">Алхам байхгүй</p>';
+            document.getElementById('cxList3').innerHTML = list3.join('') || '<p class="text-[11px] text-slate-400 italic">Алхам байхгүй</p>';
+            document.getElementById('cxList4').innerHTML = list4.join('') || '<p class="text-[11px] text-slate-400 italic">Алхам байхгүй</p>';
+        }
+
+        function updateCharts() {
+            initCxDistChart();
+            initGapRiskChart();
+        }
+
+        function initCxDistChart() {
+            var ctx = document.getElementById('cxDistributionChart');
+            if (!ctx) return;
+
+            var ind = industryData[currentIndustryKey];
+            var counts = [0, 0, 0, 0];
+            for (var i = 0; i < ind.steps.length; i++) {
+                var stepNum = ind.steps[i].cxStep;
+                if (stepNum >= 1 && stepNum <= 4) {
+                    counts[stepNum - 1]++;
+                }
+            }
+
+            if (cxDistChartInstance) cxDistChartInstance.destroy();
+
+            cxDistChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['1. Хэрэгцээ таних', '2. Хүлээлт таних', '3. Хүлээлт удирдах', '4. Нийцүүлэх'],
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: ['#F59E0B', '#3B82F6', '#A855F7', '#10B981'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function initGapRiskChart() {
+            var ctx = document.getElementById('gapRiskChart');
+            if (!ctx) return;
+
+            // Dynamic risk scores based on industry profile
+            var gapScores = {
+                ecommerce: [40, 60, 85, 90, 75],
+                banking: [70, 85, 60, 75, 80],
+                saas: [50, 65, 80, 85, 70],
+                realestate: [60, 90, 75, 95, 85],
+                healthcare: [80, 70, 85, 60, 75],
+                auto: [45, 75, 70, 80, 65]
+            };
+
+            var data = gapScores[currentIndustryKey] || [50, 50, 50, 50, 50];
+
+            if (gapRiskChartInstance) gapRiskChartInstance.destroy();
+
+            gapRiskChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gap 1 (Мэдлэг)', 'Gap 2 (Стандарт)', 'Gap 3 (Гүйцэтгэл)', 'Gap 4 (Амлалт)', 'Gap 5 (Сэтгэгдэл)'],
+                    datasets: [{
+                        label: 'Эрсдэлийн Индекс (%)',
+                        data: data,
+                        backgroundColor: ['#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6', '#10B981'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 0, max: 100, ticks: { font: { size: 10 } } },
+                        x: { ticks: { font: { size: 10 } } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function calculateSimulation() {
+            var exp = parseInt(document.getElementById('simExpSlider').value);
+            var perf = parseInt(document.getElementById('simPerfSlider').value);
+
+            document.getElementById('simExpVal').innerText = exp + '%';
+            document.getElementById('simPerfVal').innerText = perf + '%';
+
+            var diff = perf - exp;
+            var titleEl = document.getElementById('simResultTitle');
+            var descEl = document.getElementById('simResultDesc');
+            var boxEl = document.getElementById('simResultBox');
+
+            if (diff > 12) {
+                titleEl.innerText = "Эерэг үр дүн (Positive Disconfirmation) ★★★";
+                titleEl.className = "text-base sm:text-lg font-bold text-emerald-800";
+                descEl.innerText = "Бодит гүйцэтгэл маркетингийн амлалтаас даван гарлаа. Хэрэглэгчид баярлах ба брэндэд үнэнч лоял хэрэглэгч болох магадлал маш өндөр байна.";
+                boxEl.className = "p-4 rounded-xl border bg-emerald-50 border-emerald-200 space-y-2";
+            } else if (diff < -12) {
+                titleEl.innerText = "Сөрөг үр дүн (Negative Disconfirmation) ⚠";
+                titleEl.className = "text-base sm:text-lg font-bold text-red-800";
+                descEl.innerText = "Бодит үйлчилгээ маркетингийн амлалтдаа хүрсэнгүй (Gap 4). Хэрэглэгч сөрөг сэтгэгдэл үлдээж, өрсөлдөгч рүү шилжих эрсдэлтэй.";
+                boxEl.className = "p-4 rounded-xl border bg-red-50 border-red-200 space-y-2";
+            } else {
+                titleEl.innerText = "Энгийн баталгаажилт (Confirmation) ✔";
+                titleEl.className = "text-base sm:text-lg font-bold text-blue-800";
+                descEl.innerText = "Үйлчилгээ ба бараа яг амласанд таарлаа. Хэрэглэгч сэтгэл хангалуун байх боловч онцгой баярлахгүй, дахин сонгох магадлал дунд зэрэг.";
+                boxEl.className = "p-4 rounded-xl border bg-blue-50 border-blue-200 space-y-2";
+            }
+
+            updateSimChart(exp, perf);
+        }
+
+        function updateSimChart(exp, perf) {
+            var ctx = document.getElementById('simChart');
+            if (!ctx) return;
+
+            if (simChartInstance) {
+                simChartInstance.data.datasets[0].data = [exp, perf];
+                simChartInstance.update();
+            } else {
+                simChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Борлуулалтын Амлалт (Expectation)', 'Бодит Гүйцэтгэл (Performance)'],
+                        datasets: [{
+                            label: 'Түвшин (%)',
+                            data: [exp, perf],
+                            backgroundColor: ['#F59E0B', '#0D9488'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { min: 0, max: 100 }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+        }
+
+        function toggleMobileMenu() {
+            var menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        window.onload = function() {
+            selectIndustry('ecommerce');
+            calculateSimulation();
+        };
+    </script>
+</body>
+</html>
